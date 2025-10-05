@@ -1,6 +1,15 @@
 -- <leader> key (space bar)
 vim.g.mapleader = ' '
 
+-- use standard system clipboard when copying and pasting
+vim.opt.clipboard:append("unnamedplus")
+
+-- make search case insensitive by default
+vim.opt.ignorecase = true
+
+-- if uppercase is used in search it becomes case sensitive
+vim.opt.smartcase = true
+
 -- open config with leader c
 vim.cmd('nmap <leader>c :e ~/.config/nvim/init.lua<cr>')
 
