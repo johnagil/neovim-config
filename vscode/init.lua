@@ -21,3 +21,15 @@ vim.keymap.set("n", "U", "<C-r>")
 
 --clear search highlighting with esc key
 vim.keymap.set("n", "<Esc>", ":nohlsearch<cr>")
+
+-- Ctrl+Q = visual block mode
+vim.keymap.set("n", "<C-q>", "<C-v>", { noremap = true, silent = true })
+
+-- Ctrl+V = paste after cursor (normal mode)
+vim.keymap.set("n", "<C-v>", "p", { noremap = true, silent = true })
+
+-- Ctrl+V = paste from clipboard (insert mode)
+vim.keymap.set("i", "<C-v>", "<C-r>+", { noremap = true, silent = true })
+
+-- Ctrl+V = replace selection with clipboard contents (visual mode)
+vim.keymap.set("v", "<C-v>", '"_dP', { noremap = true, silent = true })
