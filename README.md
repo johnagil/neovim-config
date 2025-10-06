@@ -1,4 +1,4 @@
-## My configuration files for neovim using lazyvim and vscode
+## My configuration files for neovim
 ### lazyvim settings are in ~/.config/nvim
 ### vscode settings are in ~/.config/nvim/vscode - point vscode neovim plugin to ~/.config/nvim/vscode/init.lua
 
