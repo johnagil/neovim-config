@@ -1,0 +1,87 @@
+---
+- name: Bootstrap dev environment
+  hosts: localhost
+  become: false
+  gather_facts: false
+
+  vars:
+    brew_prefix: "/home/linuxbrew/.linuxbrew"
+    brew_bin: "{{ brew_prefix }}/bin/brew"
+    brew_packages:
+      - git
+      - neovim
+      - tmux
+      - fzf
+      - ripgrep
+
+  tasks:
+    # --- Ensure dependencies for Homebrew ---
+    - name: Ensure build dependencies are installed
+      ansible.builtin.package:
+        name:
+          - build-essential
+          - curl
+          - file
+          - git
+        state: present
+      become: true
+
+    # --- Install Homebrew if missing ---
+    - name: Check if Homebrew is installed
+      ansible.builtin.stat:
+        path: "{{ brew_bin }}"
+      register: brew_check
+
+    - name: Install Homebrew if not present
+      ansible.builtin.shell: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      when: not brew_check.stat.exists
+      args:
+        executable: /bin/bash
+      environment:
+        NONINTERACTIVE: "1"
+
+    # --- Setup environment for brew ---
+    - name: Ensure brew environment is loaded for subsequent tasks
+      ansible.builtin.shell: |
+        eval "$({{ brew_bin }} shellenv)"
+        echo "export PATH=$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH" >> ~/.bashrc
+        echo "export HOMEBREW_NO_ENV_HINTS=1" >> ~/.bashrc
+      changed_when: false
+
+    # --- Install packages with detailed output ---
+    - name: Install packages via Homebrew
+      ansible.builtin.shell: |
+        set -e
+        eval "$({{ brew_bin }} shellenv)"
+        changed=0
+        for pkg in {{ brew_packages | join(' ') }}; do
+          if ! brew list --versions "$pkg" >/dev/null 2>&1; then
+            echo ">>> Installing $pkg..."
+            brew install "$pkg" || echo "⚠️  Warning installing $pkg"
+            changed=1
+          else
+            echo "✅ $pkg already installed"
+          fi
+        done
+        exit 0
+      register: brew_install
+      changed_when: "'Installing' in brew_install.stdout"
+      failed_when: false # ignore ARM64 warnings, only fail on real errors
+
+    - name: Print brew install logs
+      ansible.builtin.debug:
+        var: brew_install.stdout_lines
+
+    # --- Verify everything works ---
+    - name: Verify key binaries
+      ansible.builtin.shell: |
+        eval "$({{ brew_bin }} shellenv)"
+        which nvim && which tmux && which fzf && which rg
+      register: verify_cmds
+      changed_when: false
+      failed_when: verify_cmds.rc != 0
+
+    - name: Show verification results
+      ansible.builtin.debug:
+        var: verify_cmds.stdout_lines
