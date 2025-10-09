@@ -2,11 +2,9 @@
 - name: Bootstrap dev environment
   hosts: localhost
   become: false
-  gather_facts: false
+  gather_facts: true
 
   vars:
-    brew_prefix: "/home/linuxbrew/.linuxbrew"
-    brew_bin: "{{ brew_prefix }}/bin/brew"
     brew_packages:
       - git
       - neovim
@@ -15,8 +13,28 @@
       - ripgrep
 
   tasks:
-    # --- Ensure dependencies for Homebrew ---
-    - name: Ensure build dependencies are installed
+    # --- Detect OS and set brew prefix ---
+    - name: Set brew prefix for macOS ARM (Apple Silicon)
+      ansible.builtin.set_fact:
+        brew_prefix: "/opt/homebrew"
+      when: ansible_os_family == "Darwin" and ansible_machine == "arm64"
+
+    - name: Set brew prefix for macOS Intel
+      ansible.builtin.set_fact:
+        brew_prefix: "/usr/local"
+      when: ansible_os_family == "Darwin" and ansible_machine == "x86_64"
+
+    - name: Set brew prefix for Linux
+      ansible.builtin.set_fact:
+        brew_prefix: "/home/linuxbrew/.linuxbrew"
+      when: ansible_os_family != "Darwin"
+
+    - name: Set brew binary path
+      ansible.builtin.set_fact:
+        brew_bin: "{{ brew_prefix }}/bin/brew"
+
+    # --- Ensure dependencies for Homebrew (Linux only) ---
+    - name: Ensure build dependencies are installed (Linux)
       ansible.builtin.package:
         name:
           - build-essential
@@ -25,6 +43,7 @@
           - git
         state: present
       become: true
+      when: ansible_os_family != "Darwin"
 
     # --- Install Homebrew if missing ---
     - name: Check if Homebrew is installed
@@ -85,3 +104,31 @@
     - name: Show verification results
       ansible.builtin.debug:
         var: verify_cmds.stdout_lines
+
+    # --- Install LazyVim starter ---
+    - name: Check if nvim config exists
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.config/nvim"
+      register: nvim_config
+
+    - name: Backup existing nvim config
+      ansible.builtin.command:
+        cmd: "mv {{ ansible_env.HOME }}/.config/nvim {{ ansible_env.HOME }}/.config/nvim.bak"
+      when: nvim_config.stat.exists
+      ignore_errors: false
+
+    - name: Clone LazyVim starter
+      ansible.builtin.git:
+        repo: https://github.com/LazyVim/starter
+        dest: "{{ ansible_env.HOME }}/.config/nvim"
+        version: main
+        force: false
+
+    - name: Remove .git folder from LazyVim starter
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.config/nvim/.git"
+        state: absent
+
+    - name: LazyVim installation complete
+      ansible.builtin.debug:
+        msg: "✅ LazyVim starter installed to ~/.config/nvim"
