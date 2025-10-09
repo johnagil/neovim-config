@@ -5,12 +5,12 @@ set -e
 OS="$(uname -s)"
 
 if [[ "$OS" == "Linux" ]]; then
-  # On Linux: Install Git first (required for Homebrew), then Homebrew
+  # On Linux: Install required build tools and Git first (required for Homebrew), then Homebrew
   if ! command -v git &>/dev/null; then
-    echo "Installing Git..."
-    sudo apt install -y git
+    echo "Installing required tools: build-essential, procps, curl, file, and git..."
+    sudo apt install -y build-essential procps curl file git
   else
-    echo "✅ Git already installed."
+    echo "✅ Git and other tools already installed."
   fi
 
   # Ensure Git is in PATH
