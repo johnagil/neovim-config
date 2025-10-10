@@ -33,6 +33,10 @@
       ansible.builtin.set_fact:
         brew_bin: "{{ brew_prefix }}/bin/brew"
 
+    - name: Set tmux config path
+      ansible.builtin.set_fact:
+        tmux_path: "~/.tmux.conf"
+
     # --- Ensure dependencies for Homebrew (Linux only) ---
     - name: Ensure build dependencies are installed (Linux)
       ansible.builtin.package:
@@ -132,3 +136,18 @@
     - name: LazyVim installation complete
       ansible.builtin.debug:
         msg: "✅ LazyVim starter installed to ~/.config/nvim"
+
+    - name: Check if tmux config exists
+      ansible.builtin.stat:
+        path: "{{ tmux_path }}"
+      register: tmux_config
+
+    - name: Create tmux config if it does not exist
+      ansible.builtin.command:
+        cmd: "touch {{ tmux_path }}"
+      when: not tmux_config.stat.exists
+      ignore_errors: false
+
+    - name: Symlink tmux config to .config/nvim/tmux.conf
+      ansible.builtin.command:
+        cmd: "ln -s {{ tmux_path }} ~/.config/nvim/tmux.conf"
