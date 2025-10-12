@@ -125,17 +125,24 @@
       when: nvim_config.stat.exists
       ignore_errors: false
 
-    - name: Clone LazyVim starter
+    # - name: Clone LazyVim starter
+    #   ansible.builtin.git:
+    #     repo: https://github.com/LazyVim/starter
+    #     dest: "{{ ansible_env.HOME }}/.config/nvim"
+    #     version: main
+    #     force: false
+
+    # - name: Remove .git folder from LazyVim starter
+    #   ansible.builtin.file:
+    #     path: "{{ ansible_env.HOME }}/.config/nvim/.git"
+    #     state: absent
+
+    - name: Clone LazyVim config
       ansible.builtin.git:
-        repo: https://github.com/LazyVim/starter
+        repo: https://github.com/johnagil/neovim-config
         dest: "{{ ansible_env.HOME }}/.config/nvim"
         version: main
         force: false
-
-    - name: Remove .git folder from LazyVim starter
-      ansible.builtin.file:
-        path: "{{ ansible_env.HOME }}/.config/nvim/.git"
-        state: absent
 
     - name: LazyVim installation complete
       ansible.builtin.debug:
