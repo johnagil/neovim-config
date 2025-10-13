@@ -11,6 +11,7 @@
       - tmux
       - fzf
       - ripgrep
+      - node
 
   tasks:
     # --- Detect OS and set brew prefix ---
