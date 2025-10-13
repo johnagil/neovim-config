@@ -12,6 +12,7 @@
       - fzf
       - ripgrep
       - node
+      - lazygit
 
   tasks:
     # Detect OS and set brew prefix
