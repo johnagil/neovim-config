@@ -1,8 +1,13 @@
-## My configuration files for neovim
-### lazyvim settings are in ~/.config/nvim
-### vscode settings are in ~/.config/nvim/vscode - point vscode neovim plugin to ~/.config/nvim/vscode/init.lua
+## My configuration files and automated setup for neovim
 
-# 💤 LazyVim
+### Setup scripts are in ~/.config/scripts/
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+- If using ubuntu or wsl make sure to run sudo apt update and sudo apt upgrade before running scripts
+- Put bootstrap.sh and setup.yml in the same directory then run bootstrap.sh
+- LazyVim settings are in ~/.config/nvim
+- If using neovim vscode plugin the settings are in ~/.config/nvim/vscode
+- Point vscode plugin to ~/.config/nvim/vscode/init.lua
+
+# Created with 💤 LazyVim
+
+A starter template for [LazyVim](https://github.com/LazyVim/LazyVim). Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
