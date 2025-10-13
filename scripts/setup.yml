@@ -14,7 +14,7 @@
       - node
 
   tasks:
-    # --- Detect OS and set brew prefix ---
+    # Detect OS and set brew prefix
     - name: Set brew prefix for macOS ARM (Apple Silicon)
       ansible.builtin.set_fact:
         brew_prefix: "/opt/homebrew"
@@ -42,7 +42,7 @@
       ansible.builtin.set_fact:
         markdownlint_path: "~/.markdownlint-cli2.yaml"
 
-    # --- Ensure dependencies for Homebrew (Linux only) ---
+    # Ensure dependencies for Homebrew (Linux only)
     - name: Ensure build dependencies are installed (Linux)
       ansible.builtin.package:
         name:
@@ -54,7 +54,7 @@
       become: true
       when: ansible_os_family != "Darwin"
 
-    # --- Install Homebrew if missing ---
+    # Install Homebrew if missing
     - name: Check if Homebrew is installed
       ansible.builtin.stat:
         path: "{{ brew_bin }}"
@@ -69,7 +69,7 @@
       environment:
         NONINTERACTIVE: "1"
 
-    # --- Setup environment for brew ---
+    # Setup environment for brew
     - name: Ensure brew environment is loaded for subsequent tasks
       ansible.builtin.shell: |
         eval "$({{ brew_bin }} shellenv)"
@@ -77,7 +77,7 @@
         echo "export HOMEBREW_NO_ENV_HINTS=1" >> ~/.bashrc
       changed_when: false
 
-    # --- Install packages with detailed output ---
+    # Install packages with detailed output
     - name: Install packages via Homebrew
       ansible.builtin.shell: |
         set -e
@@ -101,11 +101,11 @@
       ansible.builtin.debug:
         var: brew_install.stdout_lines
 
-    # --- Verify everything works ---
+    # Verify everything works
     - name: Verify key binaries
       ansible.builtin.shell: |
         eval "$({{ brew_bin }} shellenv)"
-        which nvim && which tmux && which fzf && which rg
+        which nvim && which tmux && which fzf && which rg && which node
       register: verify_cmds
       changed_when: false
       failed_when: verify_cmds.rc != 0
@@ -114,31 +114,20 @@
       ansible.builtin.debug:
         var: verify_cmds.stdout_lines
 
-    # --- Install LazyVim starter ---
+    # Check if nvim config exists for backup
     - name: Check if nvim config exists
       ansible.builtin.stat:
         path: "{{ ansible_env.HOME }}/.config/nvim"
       register: nvim_config
 
+    # Backup nvim config if it exists
     - name: Backup existing nvim config
       ansible.builtin.command:
         cmd: "mv {{ ansible_env.HOME }}/.config/nvim {{ ansible_env.HOME }}/.config/nvim.bak"
       when: nvim_config.stat.exists
       ignore_errors: false
 
-    # - name: Clone LazyVim starter
-    #   ansible.builtin.git:
-    #     repo: https://github.com/LazyVim/starter
-    #     dest: "{{ ansible_env.HOME }}/.config/nvim"
-    #     version: main
-    #     force: false
-
-    # - name: Remove .git folder from LazyVim starter
-    #   ansible.builtin.file:
-    #     path: "{{ ansible_env.HOME }}/.config/nvim/.git"
-    #     state: absent
-
-    - name: Clone LazyVim config
+    - name: Clone LazyVim config from my github
       ansible.builtin.git:
         repo: https://github.com/johnagil/neovim-config
         dest: "{{ ansible_env.HOME }}/.config/nvim"
