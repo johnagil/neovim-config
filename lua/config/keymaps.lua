@@ -5,9 +5,6 @@
 -- <leader> key (space bar)
 vim.g.mapleader = " "
 
--- open config with leader c
-vim.cmd("nmap <leader>c :e ~/.config/nvim/init.lua<cr>")
-
 -- redo with capital U
 vim.keymap.set("n", "U", "<C-r>")
 
