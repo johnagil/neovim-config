@@ -1,0 +1,82 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+  // Toggle between terminal and editor focus
+  // a lot of overlap to try to also replicate neovim switching
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.terminal.focus"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.terminal.focus"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.terminal.focus"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "workbench.action.focusActiveEditorGroup",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "shift+enter",
+    "command": "colonize.newline",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+enter",
+    "command": "-colonize.newline",
+    "when": "editorTextFocus"
+  },
+  {
+    // increment each line selected by 1
+    "key": "alt+i",
+    "command": "editor.action.insertSnippet",
+    "args": {
+      "snippet": "$CURSOR_NUMBER" // this will increment and is 1-based
+    }
+  },
+  {
+    "key": "ctrl+i",
+    "command": "composerMode.agent"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "aichat.newchataction"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "-aichat.newchataction"
+  },
+  {
+    "key": "ctrl+alt+l",
+    "command": "composer.sendToAgent",
+    "when": "editorHasPromptBar && editorPromptBarFocused"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "-composer.sendToAgent",
+    "when": "editorHasPromptBar && editorPromptBarFocused"
+  },
+  {
+    "key": "ctrl+`",
+    "command": "workbench.action.terminal.toggleTerminal",
+    "when": "terminal.active"
+  },
+  {
+    "key": "ctrl+`",
+    "command": "-workbench.action.terminal.toggleTerminal",
+    "when": "terminal.active"
+  }
+]
